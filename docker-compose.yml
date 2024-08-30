@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: production
+    command: npm start
+    
+  postgres:
+    image: postgres
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: meterAI
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local
