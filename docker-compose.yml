@@ -1,7 +1,6 @@
-version: '3.8'
-
 services:
-  app:
+  backend:
+    container_name: backend-container
     build: ./
     ports:
       - "3000:3000"
@@ -10,12 +9,11 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    environment:
-      NODE_ENV: production
-    command: npm start
-    
+    depends_on:
+      - postgres
+
   postgres:
-    image: postgres
+    image: postgres:latest
     container_name: postgres-container
     environment:
       POSTGRES_USER: username
