@@ -37,7 +37,7 @@ export class GeminiService {
     filePath: string,
     mimeType: string,
     measure_type: string,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const gemini_api_key = process.env.GEMINI_API_KEY || "GEMINI_API_KEY";
     const genAI = new GoogleGenerativeAI(gemini_api_key);
     const fileManager = new GoogleAIFileManager(gemini_api_key);
@@ -62,9 +62,8 @@ export class GeminiService {
         return parseInt(match[0]);
       }
       return 0;
-    } catch (error) {
-      console.error("Error: ", error);
-      return 0;
+    } catch {
+      return null;
     }
   }
 }

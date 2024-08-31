@@ -1,7 +1,7 @@
-import { Measure } from "src/models/Measure";
+import { AppDataSource } from "../../config/initializeDB";
+import { Measure } from "../../models/Measure";
 import { GeminiService } from "./geminiService";
 import { StorageService } from "./storageService";
-import { AppDataSource } from "src/config/initializeDB";
 
 const appDataSource = AppDataSource.getRepository(Measure);
 

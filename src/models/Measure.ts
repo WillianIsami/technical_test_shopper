@@ -20,6 +20,6 @@ export class Measure {
   @Column({ type: "boolean", default: false })
   has_confirmed!: boolean;
 
-  @Column({ type: "string", nullable: false })
+  @Column({ type: "text", nullable: false })
   image_url!: string;
 }

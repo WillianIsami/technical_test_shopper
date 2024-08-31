@@ -3,14 +3,18 @@ import { parse, isValid } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fse from "fs-extra";
-import { GeminiService } from "src/services/MeasureServices/geminiService";
-import { StorageService } from "src/services/MeasureServices/storageService";
+import { GeminiService } from "../services/MeasureServices/geminiService";
+import { StorageService } from "../services/MeasureServices/storageService";
 
 export class UploadMeasureController {
   constructor(
     private geminiService: GeminiService,
     private storageService: StorageService,
   ) {}
+
+  run = async (req: Request, res: Response) => {
+    return await this.execute(req, res);
+  };
 
   public async execute(req: Request, res: Response) {
     const { image, customer_code, measure_datetime, measure_type } = req.body;
@@ -55,8 +59,9 @@ export class UploadMeasureController {
         error_description: "Customer code field is missing",
       });
     }
-    const datetime = new Date(measure_datetime);
-    if (datetime.getMonth === new Date().getMonth) {
+    if (
+      await this.storageService.duplicateDatetime(customer_code, parsedDate)
+    ) {
       return res.status(409).json({
         error_code: "DOUBLE_REPORT",
         error_description: "Leitura do mês já realizada",
@@ -64,11 +69,10 @@ export class UploadMeasureController {
     }
     const fileExtension = mimeType.replace("image/", "");
     const filename = `${uuidv4()}.${fileExtension}`;
-    const filePath = path.join(__dirname, "../public/uploads", filename);
+    const filePath = path.join(__dirname, "../../public/uploads", filename);
     try {
-      const uploadDir = path.join(__dirname, "../public", "uploads");
       const imageBuffer = Buffer.from(base64Image, "base64");
-      await fse.ensureDir(uploadDir);
+      await fse.ensureDir(path.join(__dirname, "../../public", "uploads"));
       await fse.writeFile(filePath, imageBuffer);
 
       const host = req.get("host");
@@ -86,7 +90,13 @@ export class UploadMeasureController {
         mimeType,
         measure_type,
       );
-
+      if (measure_value === null) {
+        fse.remove(filePath);
+        return res.status(500).json({
+          error_code: "INTERNAL_SERVER_ERROR",
+          error_description: "Error trying to read image with gemini",
+        });
+      }
       const measure = {
         customer_code: customer_code,
         measure_datetime: new Date(measure_datetime),
@@ -95,7 +105,6 @@ export class UploadMeasureController {
         image_url: image_url,
       };
       const savedMeasure = await this.storageService.saveMeasure(measure);
-
       return res.status(200).json({
         image_url,
         measure_value,
