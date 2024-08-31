@@ -19,9 +19,8 @@ This project is an API for handling measurements, including image uploads, confi
 1. Clone the repository
 2. Install dependencies: `npm install`
 3. Set up environment variables (create a `.env` file in the root directory): `GEMINI_API_KEY=your_google_api_key`
-4. Run the server: `npm run dev` or `npm start`
-OR
-4. Run with docker: `docker compose up -d`
+4. Run the server with npm: `npm run dev` or `npm start`
+5. Run with docker: `docker compose up -d`
 
 ## API Endpoints
 
@@ -35,7 +34,7 @@ OR
  "image": "base64",
  "customer_code": "string",
  "measure_datetime": "datetime",
- "measure_type": "WATER" ou "GAS"
+ "measure_type": "WATER" || "GAS"
 }
 ```
 - **Description:** Read a Base64-encoded image and upload it to the Gemini API to extract water or gas values from the meter.
@@ -49,7 +48,7 @@ OR
 ```json
 {
  "measure_uuid": "string",
- "confirmed_value": integer
+ "confirmed_value": "integer"
 }
 ```
 - **Description:** Confirms a previously uploaded measurement.
